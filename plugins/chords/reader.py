@@ -33,16 +33,19 @@ class ChordsReader(BaseReader):
       contain, at least a ``title``, ``category`` and ``date``.
     '''
 
-    import ipdb; ipdb.set_trace()
+    if 'artists' in filename: cls = Artist
+    elif 'songs' in filename: cls = Song
+    elif 'collections' in filename: cls = Collection
+    else:
+      raise RuntimeError('can only read articles in a category folder named' \
+          ' either "artists", "songs" or "collections" -- %s is not valid' \
+          % filename)
 
-    metadata = {
-        'title': 'Oh yeah',
-        'category': 'Foo',
-        'date': '2012-12-01',
-        }
+    obj = cls(filename)
 
-    parsed = {}
-    for key, value in metadata.items():
+    # normalize to make pelican happy
+    parsed = obj.as_dict()
+    for key, value in obj.as_dict().items():
       parsed[key] = self.process_metadata(key, value)
 
-    return "Some content", parsed
+    return str(obj), parsed

@@ -6,4 +6,6 @@
 def register():
   from pelican import signals
   from .reader import ChordsReader as Reader
-  signals.readers_init.connect(lambda x: x.reader_classes['chords'] = Reader)
+  def _setup(x):
+    x.reader_classes['chords'] = Reader
+  signals.readers_init.connect(_setup)

@@ -6,7 +6,7 @@
 
 import os
 import yaml
-import dateutil
+import datetime
 
 
 def _basename(filename):
@@ -45,6 +45,8 @@ class Artist(object):
 
   def as_dict(self):
     return dict(
+        title = self.name, #to make pelican happy
+        date = datetime.date.today().strftime('%Y-%m-%d'),
         name = self.name,
         color = self.color,
         slug = self.slug,
@@ -83,16 +85,12 @@ class Song(object):
       self.performer_slug = data.get('performer-slug')
       self.composer_slug = data.get('composer-slug')
       self.two_columns = data.get('two-columns') #should be drawn in 2-columns
-      self.slug = data.get('slug', _basename(filename)
+      self.slug = data.get('slug', _basename(filename))
       self.category = 'songs'
 
-      # parse dates
-      if self.date is not None:
-        self.date = dateutil.parser.parse(self.date)
-      if self.modified is not None:
-        self.modified = dateutil.parser.parse(self.modified)
-      if self.year is not None:
-        self.year = dateutil.parser.parse(self.year)
+      # transform into datetime as pelican requires it
+      if self.date: self.date = self.date.strftime('%Y-%m-%d')
+      if self.modified: self.modified = self.modified.strftime('%Y-%m-%d')
 
 
   def __str__(self):
@@ -114,7 +112,7 @@ class Song(object):
         )
 
 
-class Collections(object):
+class Collection(object):
   '''A collection corresponds to a list of songs with a name
 
 
@@ -129,32 +127,32 @@ class Collections(object):
     with open(filename) as f:
       data = yaml.load(f)
 
-      # name is obligatory
-      assert 'name' in data, 'name attribute not found at %s' % (filename,)
+      assert 'title' in data, 'title attribute not found at %s' % (filename,)
+      assert 'date' in data, 'date attribute not found at %s' % (filename,)
+      assert 'modified' in data, 'modified attribute not found at %s' % \
+          (filename,)
       assert 'song-slugs' in data, \
           'song-slugs attribute not found at %s' % (filename,)
 
-      self.name = data['name']
+      self.title = data['title']
       self.date = data.get('date')
       self.modified = data.get('modified')
       self.song_slugs = data['song-slugs']
       self.category = 'collections'
-      self.slug = data.get('slug', _basename(filename)
+      self.slug = data.get('slug', _basename(filename))
 
-      # parse dates
-      if self.date is not None:
-        self.date = dateutil.parser.parse(self.date)
-      if self.modified is not None:
-        self.modified = dateutil.parser.parse(self.modified)
+      # transform into datetime as pelican requires it
+      if self.date: self.date = self.date.strftime('%Y-%m-%d')
+      if self.modified: self.modified = self.modified.strftime('%Y-%m-%d')
 
 
   def __str__(self):
-    return '%s (%d songs)' % (self.name, len(self.song_slugs))
+    return '%s (%d songs)' % (self.title, len(self.song_slugs))
 
 
   def as_dict(self):
     return dict(
-        name = self.name,
+        title = self.title,
         date = self.date,
         modified = self.modified,
         song_slugs = self.song_slugs,
