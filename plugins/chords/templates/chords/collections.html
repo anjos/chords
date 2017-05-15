@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load staticfiles i18n chords_tags %}
+
+{% block media %}
+{{ block.super }}
+  <link href="{% static "chords/css/style.css" %}" rel="stylesheet" type="text/css" media="screen" />
+{% endblock %}
+
+{% block title %}{% trans "Collections" %}{% endblock %}
+
+{% block content %}
+<div class="chords">
+  <p class="navigation">
+  <span class="item"><a href="/admin/chords/collection/">{% trans "Manage collections" %}</a></span>
+  <span class="item"><a href="/admin/chords/collection/add/">{% trans "Add collection" %}</a></span>
+  <span class="item"><a href="{% url chords:view-artists %}">{% trans "View Artists" %}</a></span>
+  <span class="item"><a href="{% url chords:view-songs %}">{% trans "View Songs" %}</a></span>
+  </p>
+  <p class="title">{% trans "Available Collections" %}</p>
+  
+  <p>{% blocktrans count object_list.count as counter %}From this page you have access to the only created collection.{% plural %}From this page you have access to all {{ counter }} collections.{% endblocktrans %}</p>
+
+  <table class="songs">
+    <tr>
+      <th>{% trans "Shortcuts" %}</th>
+      <th>{% trans "Name" %} {% chords_sorter "name" %}</th>
+      <th>{% trans "Created" %} {% chords_sorter "date" %}</th>
+      <th>{% trans "Owner" %}{% chords_sorter "owner" %}</th>
+      <th>{% trans "Songs" %}</th>
+      <th>{% trans "Last Update" %}</th>
+    </tr>
+    {% for obj in object_list %}
+    <tr class="{% cycle "even" "odd" %}">
+      <td class="shortcuts">
+        <a href="{% url chords:view-collection obj.id %}" title="{% trans "view this collection" %}"><img src="{% static "chords/img/icons/16x16/home.png" %}" width="16" height="16"/></a>
+        <a href="{% url chords:view-collection-songbook-pdf obj.id %}" title="{% trans "download a PDF of this collection" %}"><img src="{% static "chords/img/icons/16x16/pdf.png" %}" width="16" height="16"/></a>
+        <a href="{% url admin:chords_collection_change obj.id %}" title="{% trans "edit this collection" %}"><img src="{% static "chords/img/icons/16x16/edit.png" %}" width="16" height="16"/></a>
+      </td>
+      <td class="title"><a href="{% url chords:view-collection obj.id %}" title="{% trans "Click here to access this collection" %}">{{ obj.name }}</a></td>
+      <td class="date">{{ obj.date|date:"d/b/Y H:i" }}</td>
+      <td class="owner">{{ obj.owner.first_name.capitalize }}</td>
+      <td class="songs">{{ obj.song.count }}</td>
+      <td class="last-song">{% with obj.last_update as s %}{{ s.title }} {% trans "in" %} {{ s.get_tone_display }}{% endwith %}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="6">{% trans "No collections created so far." %}</td></tr>
+    {% endfor %}
+  </table>
+
+</div>
+{% endblock %}
