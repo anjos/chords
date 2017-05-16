@@ -12,7 +12,7 @@ install:
   - conda update -n root -q conda
   - conda info -a
   - conda env create -f env.yml
-  - source activate site
+  - source activate chords2
 
 script:
   - pelican
@@ -27,7 +27,7 @@ deploy:
   skip_cleanup: true
   github_token: $GITHUB_TOKEN # Set in travis-ci.org dashboard
   local_dir: output
-  repo: anjos/chords.github.io
+  repo: anjos/cifras.github.io
   target_branch: master
   on:
     tags: true
