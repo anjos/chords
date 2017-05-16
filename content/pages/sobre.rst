@@ -9,6 +9,15 @@ Sobre Mim
 Meu nome é André Rabello dos Anjos. Este site contém cifras das músicas que
 gosto de tocar no cavaquinho. Há também músicas que toco com meu irmão.
 
+.. figure:: {filename}/images/sobre/andreanjos-at-atlas.jpg
+   :width: 90 %
+   :figwidth: 40 %
+   :align: center
+   :alt: André, Setembro de 2010
+
+   Uma foto minha, de Setembro de 2010.
+
+
 Se você está interessado em código, você deve checar minhas contribuições no
 GitHub_. Especificamente, se você se pergunta como `este website`_ foi feito,
 olhe naquele atalho.
