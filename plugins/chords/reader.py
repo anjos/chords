@@ -28,9 +28,12 @@ class ChordsReader(BaseReader):
 
     Returns:
 
-      str: A summary of what was loaded
+      str: The content of the loaded article (this should be in HTML, without
+      special markup added so it can be customized by the user)
+
       dict: A dictionary containing the parsed metadata for the file. Should
       contain, at least a ``title``, ``category`` and ``date``.
+
     '''
 
     if 'artists' in filename: cls = Artist
@@ -48,4 +51,4 @@ class ChordsReader(BaseReader):
     for key, value in obj.as_dict().items():
       parsed[key] = self.process_metadata(key, value)
 
-    return str(obj), parsed
+    return obj.content, parsed

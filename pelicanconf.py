@@ -3,10 +3,10 @@
 from __future__ import unicode_literals
 
 AUTHOR = 'André Anjos'
-SITENAME = 'Chords'
-SITETITLE = 'Chords'
-SITESUBTITLE = 'Songs & Collections'
-SITEDESCRIPTION = 'Chordbook Website'
+SITENAME = 'Cifras'
+SITETITLE = 'Cifras'
+SITESUBTITLE = 'Músicas & Coletâneas'
+SITEDESCRIPTION = 'Website de Cifras'
 SITELOGO = '/images/profile_128.png'
 FAVICON = '/images/favicon.ico'
 SITEURL = 'http://chords.andreanjos.org'
@@ -55,18 +55,16 @@ DIRECT_TEMPLATES = [
     'index',
     ]
 LINKS = (
-    ('Songs', '/songs/'),
-    ('Artists', '/artists/'),
-    ('Collections', '/collections/'),
-    ('About', '/about/'),
+    ('Músicas', '/songs/'),
+    ('Artistas', '/artists/'),
+    ('Coletâneas', '/collections/'),
+    ('Sobre', '/sobre/'),
     )
 
 # Social widget
 SOCIAL = (
-    ('linkedin', 'https://www.linkedin.com/in/andreranjos/'),
     ('stack-overflow', 'https://stackoverflow.com/users/712525/andré-anjos'),
     ('github', 'https://github.com/anjos'),
-    ('gitlab', 'https://gitlab.idiap.ch/bob'),
     ('skype', 'skype:andrezito?call'),
     )
 GOOGLE_ANALYTICS = 'UA-37998740-1'
@@ -97,3 +95,11 @@ PAGE_SAVE_AS = '{slug}/index.html'
 
 # Uncomment following line if you want document-relative URLs when developing
 RELATIVE_URLS = True
+
+# URL organization for the chords plugin
+ARTIST_URL = 'artists/{slug}/'
+ARTIST_SAVE_AS = 'artists/{slug}/index.html'
+SONG_URL = 'songs/{slug}/'
+SONG_SAVE_AS = 'songs/{slug}/index.html'
+COLLECTION_URL = 'collections/{slug}/'
+COLLECTION_SAVE_AS = 'collections/{slug}/index.html'
