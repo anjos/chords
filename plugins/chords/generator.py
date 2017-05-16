@@ -88,12 +88,17 @@ class Generator(pelican.generators.CachingGenerator):
           setattr(obj, 'slug', getattr(obj, 'slug',
             os.path.basename(os.path.splitext(obj.source_path)[0])))
 
+          if klass == Artist:
+            setattr(obj, 'songs', [])
+
           if klass == Song:
             for artist in ('performer', 'composer'):
               slug = data.get('%s-slug' % artist)
               if slug is not None:
                 if slug in _artists:
-                  obj.metadata[artist] = _artists[slug]
+                  setattr(obj, artist, _artists[slug])
+                  if obj not in _artists[slug].songs:
+                    _artists[slug].songs.append(obj)
                 else:
                   logger.error('Could not process %s\nCannot link %s', f,
                       artist)
@@ -101,10 +106,10 @@ class Generator(pelican.generators.CachingGenerator):
                   continue
 
           if klass == Collection:
-            obj.metadata['songs'] = []
+            setattr(obj, 'songs', [])
             for slug in obj.metadata['song-slugs']:
               if slug in _songs:
-                obj.metadata['songs'].append(_songs[slug])
+                obj.songs.append(_songs[slug])
               else:
                 logger.error('Could not process %s\nCannot link %s', f, slug)
                 self._add_failed_source_path(f)

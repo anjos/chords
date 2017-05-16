@@ -7,7 +7,8 @@ Sobre Mim
 
 
 Meu nome é André Rabello dos Anjos. Este site contém cifras das músicas que
-gosto de tocar no cavaquinho. Há também músicas que toco com meu irmão.
+gosto de tocar no cavaquinho. Há também músicas que toco com meus familiares,
+ou cifras prediletas do meu irmão.
 
 .. figure:: {filename}/images/sobre/andreanjos-at-atlas.jpg
    :width: 90 %
