@@ -127,8 +127,31 @@ class Generator(pelican.generators.CachingGenerator):
     pelican.signals.page_generator_finalized.send(self)
 
 
-  def generate_output(self, writer):
+  def _generate_indexes(self, writer):
+    """Generate pages allowing the user to nagivate from object to object"""
 
+    for model, objects in ((Artist, self.artists), (Song, self.songs),
+        (Collection, self.collections)):
+      name = model.__name__.lower()
+      save_as = self.settings.get("%s_LIST" % name.upper(),
+          "%ss/index.html" % name)
+      writer.write_file(
+          save_as,
+          self.get_template(model.list_template),
+          self.context,
+          objects=objects,
+          relative_urls=self.settings['RELATIVE_URLS'],
+          )
+
+
+  def _generate_objects(self, writer):
+    """Generate pages related to each indivual modelled object
+
+    This method will respect user settings for the location of pages. The name
+    of templates is taken from the corresponding class static variables.
+    """
+
+    # writes specific
     for obj in itertools.chain(self.artists, self.songs, self.collections):
       writer.write_file(
           obj.save_as,
@@ -139,3 +162,13 @@ class Generator(pelican.generators.CachingGenerator):
           override_output=hasattr(obj, 'override_save_as'),
           )
       pelican.signals.page_writer_finalized.send(self, writer=writer)
+
+
+  def generate_output(self, writer):
+    """Called by pelican as part of the generator interface
+
+    Should trigger the generation of all required documents.
+    """
+
+    self._generate_objects(writer)
+    self._generate_indexes(writer)

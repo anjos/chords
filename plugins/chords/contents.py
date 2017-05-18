@@ -15,6 +15,7 @@ class Artist(pelican.contents.Content):
 
   mandatory_properties = ('name',)
   default_template = 'artist'
+  list_template = 'artists'
 
 
 class Song(pelican.contents.Content):
@@ -23,6 +24,7 @@ class Song(pelican.contents.Content):
 
   mandatory_properties = ('title', 'tone', 'song')
   default_template = 'song'
+  list_template = 'songs'
 
 
   @property
@@ -57,3 +59,4 @@ class Collection(pelican.contents.Content):
 
   mandatory_properties = ('title', 'song-slugs')
   default_template = 'collection'
+  list_template = 'collections'

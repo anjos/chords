@@ -97,9 +97,12 @@ PAGE_SAVE_AS = '{slug}/index.html'
 RELATIVE_URLS = True
 
 # URL organization for the chords plugin
+ARTIST_LIST = 'artists/index.html'
 ARTIST_URL = 'artists/{slug}/'
 ARTIST_SAVE_AS = 'artists/{slug}/index.html'
+SONG_LIST = 'songs/index.html'
 SONG_URL = 'songs/{slug}/'
 SONG_SAVE_AS = 'songs/{slug}/index.html'
+COLLECTION_LIST = 'collections/index.html'
 COLLECTION_URL = 'collections/{slug}/'
 COLLECTION_SAVE_AS = 'collections/{slug}/index.html'
