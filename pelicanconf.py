@@ -41,7 +41,14 @@ DELETE_OUTPUT_DIRECTORY = True
 
 TIMEZONE = 'Europe/Zurich'
 
-DEFAULT_LANG = 'en'
+DEFAULT_LANG = 'pt_BR'
+LOCALE = (
+    'pt_BR',
+    )
+DEFAULT_DATE_FORMAT = '%d/%m/%Y'
+DATE_FORMATS = {
+    'pt_BR': '%d/%m/%Y',
+}
 
 # Feed generation is usually not desired when developing
 FEED_ALL_ATOM = None
@@ -52,10 +59,9 @@ AUTHOR_FEED_RSS = None
 
 # Links in the front page, aside from the static ``pages``
 DIRECT_TEMPLATES = [
-    'index',
     ]
 LINKS = (
-    ('Músicas', '/songs/'),
+    ('Músicas', '/'),
     ('Artistas', '/artists/'),
     ('Coletâneas', '/collections/'),
     ('Sobre', '/sobre/'),
@@ -100,7 +106,7 @@ RELATIVE_URLS = True
 ARTIST_LIST = 'artists/index.html'
 ARTIST_URL = 'artists/{slug}/'
 ARTIST_SAVE_AS = 'artists/{slug}/index.html'
-SONG_LIST = 'songs/index.html'
+SONG_LIST = 'index.html'
 SONG_URL = 'songs/{slug}/'
 SONG_SAVE_AS = 'songs/{slug}/index.html'
 COLLECTION_LIST = 'collections/index.html'
