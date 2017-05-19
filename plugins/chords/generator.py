@@ -9,6 +9,7 @@ application. It may also accumulate them for later output generator.
 '''
 
 import os
+import time
 import datetime
 import itertools
 import yaml
@@ -40,6 +41,7 @@ class Generator(pelican.generators.CachingGenerator):
     self.artists = []
     self.songs = []
     self.collections = []
+    self.start = time.time()
     super(Generator, self).__init__(*args, **kwargs)
 
 
