@@ -12,8 +12,8 @@ def _setup_generator(pelican_object):
 
 def _all_generators_finalized(generators):
   chords_gen = [k for k in generators if isinstance(k, Generator)][0]
-  print('Done: Chords plug-in processed {} artists, {} songs and {}' \
-      ' collections in {:.2f} seconds.'.format(
+  print('Done: Chords plug-in loaded information from {} artists, {} ' \
+      'songs and {} collections in {:.2f} seconds.'.format(
         len(chords_gen.artists),
         len(chords_gen.songs),
         len(chords_gen.collections),

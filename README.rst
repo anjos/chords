@@ -19,7 +19,7 @@ you to install a Conda_-based environment for deployment with this command
 line::
 
   $ conda env create -f env.yml
-  $ source activate site
+  $ source activate chords
 
 
 To compile a new version of the website, do::
@@ -49,8 +49,8 @@ are stored in ``.travis.yml``.
 Plugin Development
 ------------------
 
-Chords is a Pelican plugin that allows you to create and manage lyrics and
-chords as in an electronic chordbook.
+Chords works as a Pelican plugin that allows you to create and manage lyrics
+and chords as in an electronic chordbook.
 
 * Defines the concept of a song and a structured way to express chords on it
 * Can be organized by Artist or Collections.

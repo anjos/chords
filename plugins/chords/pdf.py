@@ -4,6 +4,10 @@
 """PDF generation for chords.
 """
 
+import os
+import datetime
+import PIL
+import contextlib
 
 # the pdf generation stuff
 from reportlab.platypus import Paragraph, XPreformatted, Spacer, CondPageBreak
@@ -125,7 +129,7 @@ def page_circle_center(x, y, fontsize, value):
   return x+2*fontsize, y+0.35*fontsize
 
 
-def cover_page(canvas, doc):
+def _cover_page(canvas, doc):
   """Defines the cover page layout."""
 
   from reportlab.lib.units import cm
@@ -148,7 +152,7 @@ def cover_page(canvas, doc):
   t.setTextOrigin(doc.bottomMargin, -x-font_size-2)
   t.setFont('Times-Bold', font_size)
   t.setFillGray(0.75)
-  t.textLine(u"http://chords.andreanjos.org")
+  t.textLine(u"http://cifras.andreanjos.org")
   canvas.drawText(t)
 
   canvas.restoreState()
@@ -174,7 +178,7 @@ def toc_page(canvas, doc):
   name.setTextOrigin(doc.leftMargin, y+0.4*cm)
   name.setFont('Helvetica-Bold', 20)
   name.setFillGray(1)
-  name.textLine(u'Table of Contents')
+  name.textLine('Conteúdo')
   canvas.drawText(name)
 
 
@@ -241,7 +245,7 @@ def set_basic_templates(doc):
   cover_frame = Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height,
       leftPadding=0, rightPadding=10, topPadding=3*cm, bottomPadding=5*cm)
   templates.append(PageTemplate(id='Cover', frames=cover_frame,
-    onPage=cover_page, pagesize=doc.pagesize))
+    onPage=_cover_page, pagesize=doc.pagesize))
 
   #normal frame, for the TOC
   frame = Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height,
@@ -257,9 +261,9 @@ class SongTemplate(BaseDocTemplate):
   def __init__(self, *args, **kwargs):
     from reportlab.lib.units import cm
 
-    if not kwargs.has_key('leftMargin'): kwargs['leftMargin'] = 1.5 * cm
-    if not kwargs.has_key('rightMargin'): kwargs['rightMargin'] = 1.5 * cm
-    if not kwargs.has_key('bottomMargin'): kwargs['bottomMargin'] = 1.5 * cm
+    kwargs.setdefault('leftMargin', 1.5 * cm)
+    kwargs.setdefault('rightMargin', 1.5 * cm)
+    kwargs.setdefault('bottomMargin', 1.5 * cm)
 
     BaseDocTemplate.__init__(self, *args, **kwargs)
 
@@ -270,9 +274,9 @@ class SongBookTemplate(BaseDocTemplate):
   def __init__(self, *args, **kwargs):
     from reportlab.lib.units import cm
 
-    if not kwargs.has_key('leftMargin'): kwargs['leftMargin'] = 1.5 * cm
-    if not kwargs.has_key('rightMargin'): kwargs['rightMargin'] = 1.5 * cm
-    if not kwargs.has_key('bottomMargin'): kwargs['bottomMargin'] = 1.5 * cm
+    kwargs.setdefault('leftMargin', 1.5 * cm)
+    kwargs.setdefault('rightMargin', 1.5 * cm)
+    kwargs.setdefault('bottomMargin', 1.5 * cm)
 
     BaseDocTemplate.__init__(self, *args, **kwargs)
     set_basic_templates(self)
@@ -288,51 +292,337 @@ class SongBookTemplate(BaseDocTemplate):
       self.notify('TOCEntry', (0, flowable.getPlainText(), self.page, key))
 
 
-def pdf_cover_page(songs, request):
+def cover_page(title, subtitle, url, siteurl):
   """Bootstraps our PDF sequence of flowables."""
-  from pdf import style
+
   from reportlab.platypus import Paragraph, Spacer, PageBreak
   from reportlab.lib.units import cm
-  from time import strftime
 
   story = []
-  story.append(Paragraph(u'<i>Chordbook</i><br/><b>%(site)s</b>' % \
-      {'site': 'http://chords.andreanjos.org'}, style['cover-title']))
+  story.append(Paragraph('<i>%s</i><br/><b>%s</b>' % (title, subtitle),
+      style['cover-title']))
   story.append(Spacer(1, 3*cm))
 
-  if songs.count():
-    update_date = songs.order_by('-updated')[0].updated.strftime('%a, %d/%b/%Y')
-  else:
-    update_date = u''
-  story.append(Paragraph(u'Last update: <b>%(update)s</b><br/>%(url)s<br/>Downloaded on %(date)s' % \
-      {
-       'update': update_date,
-       'url': request.build_absolute_uri(),
-       'date': strftime('%a, %d/%b/%Y'),
-      },
+  story.append(Paragraph('Compilado <b>%s</b><br/>%s' % \
+      (datetime.date.today().strftime('%a, %d/%b/%Y'), url),
       style['cover-subtitle']))
   return story
 
 
-def pdf_set_locale(request):
-  """setup language environment so the PDF is generated with good locale
-  settings. This bit of code was stolen from django.middleware.locale"""
+class PdfSong(object):
+  """A container for a song object that can interact with ReportLab to
+  genererate PDFs
+
+
+  Parameters:
+
+    song (Song): a song object
+
+  """
+
+
+  def __init__(self, song):
+    self.song = song
+
+
+  def basic_page(self, canvas, doc):
+    """Sets elements that are common to all song PDF pages in django-chords."""
+
+    from reportlab.lib.colors import Color
+    from reportlab.lib.units import cm
+    import pkg_resources
+
+    # draws the rectangle with the performer name and picture
+    # remember: coordinates (0,0) start at bottom left and go up and to the
+    # right!
+    canvas.setFillColor(self.performer_color())
+    page_height = doc.bottomMargin + doc.height + doc.topMargin
+    page_width = doc.leftMargin + doc.width + doc.rightMargin
+    y = page_height - doc.topMargin + 0.2*cm # a bit above the top margin
+    rect_height = page_height - y
+    canvas.rect(0, y, page_width, rect_height, fill=True, stroke=False)
+
+    path = pkg_resources.resource_filename(__name__, os.path.join('img',
+      'unknown.jpg'))
+    image = PIL.Image.open(path)
+
+    image_height = 100
+    image_width = (image_height/float(image.height)) * image.width
+    padding = 0.5*cm
+    image_x = page_width - image_width - padding
+    image_y = page_height - padding - image_height
+    border = 4
+    canvas.setFillGray(1)
+    canvas.setStrokeGray(0.8)
+    canvas.roundRect(image_x-border, image_y-border, image_width + (2*border),
+        image_height + (2*border), radius=border/2, fill=True, stroke=True)
+    canvas.drawImage(path, image_x, image_y, width=image_width,
+        height=image_height, mask=None)
+
+    name = canvas.beginText()
+    name.setTextOrigin(doc.leftMargin, y+0.4*cm)
+    name.setFont('Times-Roman', 20)
+    name.setFillGray(1)
+    name.textLine(self.song.performer.name)
+    canvas.drawText(name)
+
+    revision = canvas.beginText()
+    revision.setTextOrigin(doc.leftMargin, doc.bottomMargin-(0.1*cm))
+    revision.setFont('Times-Italic', 9)
+    revision.setFillColor(Color(0, 0.4, 0, 1))
+    revision.textLine(self.song.modified.strftime('%a, %d/%b/%Y'))
+    canvas.drawText(revision)
+
+    # draws a line between the columns if we are in two column mode
+    if self.song.two_columns:
+      start_pad = 1.5*cm
+      canvas.setStrokeColor(self.performer_color())
+      canvas.setLineWidth(0.1*cm)
+      canvas.setStrokeAlpha(0.5)
+      canvas.setLineCap(1) #round ends
+      canvas.line(page_width/2, doc.bottomMargin+start_pad,
+          page_width/2, image_y-border-start_pad)
+
+
+  def template_id(self):
+    return 'SongTemplate-%s' % self.song.slug
+
+
+  def add_page_template(self, doc):
+    """Adds song page template to the document."""
+
+    from reportlab.lib.units import cm
+    from reportlab.platypus.frames import Frame
+    from reportlab.platypus.doctemplate import PageTemplate
+
+    doc._calc() #taken from reportlab source code (magic)
+
+    # The switch between one or two columns PDF output reflects on having one
+    # or two frames. If we have two frames, the width and the start position
+    # of each frame has to be computed slightly differently.
+    #
+    # Special attention to the right frame or its start will meet the picture
+    # of the artist. So, we start about 2 cm down.
+
+    if self.song.two_columns:
+
+      padding = 0.5 * cm;
+      frame_width = (doc.width - padding) / 2
+      frames = [
+          Frame(doc.leftMargin, doc.bottomMargin, frame_width, doc.height,
+            id='column-1', leftPadding=0, rightPadding=0),
+          Frame(doc.leftMargin + frame_width + padding, doc.bottomMargin,
+            frame_width, doc.height - 2 * cm,
+            id='column-2', leftPadding=0, rightPadding=0),
+          ]
+    else:
+      frames = Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height,
+          id='normal', leftPadding=0, rightPadding=0)
+
+    template = [PageTemplate(id='FirstPageSongTemplate', frames=frames,
+      onPage=self.page_template_first, pagesize=doc.pagesize)]
+    doc.addPageTemplates(template)
+    template = [PageTemplate(id=self.template_id(), frames=frames,
+      onPage=self.page_template, pagesize=doc.pagesize)]
+    doc.addPageTemplates(template)
+
+
+  def page_template_first(self, canvas, doc):
+    """If the song is printed alone, the first page is special."""
+
+    canvas.saveState()
+    self.basic_page(canvas, doc)
+    canvas.restoreState()
+
+
+  def performer_color(self):
+   """Returns the equivalent reportlab Color object from the artist color."""
+
+   import struct
+   from reportlab.lib.colors import Color
+
+   rgb = struct.unpack('4B', struct.pack('>I', self.song.performer.color))[1:]
+   pdf = [k/255.0 for k in rgb] + [1.0]
+   return Color(*pdf)
+
+
+  def page_template(self, canvas, doc):
+    """Creates a personalized PDF page view for this song."""
+
+    from reportlab.lib.units import cm
+
+    canvas.saveState()
+
+    self.basic_page(canvas, doc)
+
+    # Draws song name and page number
+    title = canvas.beginText()
+    title.setTextOrigin(doc.leftMargin + doc.width/2, doc.bottomMargin-(0.1*cm))
+    title.setFont('Times-Roman', 9)
+    title.setFillGray(0.2)
+    title.textLine(u"%s" % (self.song.title))
+    page_x = doc.width+doc.rightMargin+0.2*cm
+    page_y = doc.bottomMargin-(0.1*cm)
+    page_fontsize = 11
+    page = canvas.beginText()
+    page.setTextOrigin(page_x, page_y)
+    page.setFont('Helvetica-Bold', page_fontsize)
+    page.setFillGray(1)
+    page_number = doc.page
+    page.textLine('%d' % page_number)
+
+    #circle around number
+    canvas.setFillColor(self.performer_color())
+    circle_x, circle_y = page_circle_center(page_x, page_y,
+        page_fontsize, page_number)
+    canvas.circle(circle_x, circle_y, 1.5*page_fontsize, fill=True,
+        stroke=False)
+
+    canvas.drawText(title)
+    canvas.drawText(page)
+
+    canvas.restoreState()
+
+
+  def story(self, doc):
+    """Writes itself as a PDF story."""
+
+    # what is the maximum width of text?
+    if self.song.two_columns: width = colwidth['double']
+    else: width = colwidth['single']
+
+    story = [Paragraph(self.song.title, style['song-title'])]
+    story.append(Paragraph('Tom: %s' % self.song.tone, style['tone']))
+    story.append(Spacer(1, fontsize))
+    story += [k.as_flowable(width) for k in self.song.items()]
+    story = [k for k in story if k]
+
+    return tide(story, doc)
+
+
+@contextlib.contextmanager
+def pelican_locale(settings):
+  """Temporarily switches the locale to the top pelican one
+
+  Parameters:
+
+    settings (dict): Pelican settings
+
+  """
 
   import locale
-  from django.utils import translation
+
+  # LOCALE setup
+  # sets the locale so the dates and such get correctly printed
+  pelican_locale = settings.get('LOCALE', ('en',))[0]
 
   old_locale = locale.getlocale()
-
   # this will try to get a language we support from the user preferences
-  try_language = translation.get_language_from_request(request)
-  # reparse to make a suitable format.
-  try_language = locale.normalize(try_language.replace('-','_'))
-
+  try_language = locale.normalize(pelican_locale)
   new_locale = (try_language, old_locale[1])
-
   try:
     locale.setlocale(locale.LC_ALL, new_locale)
   except:
     pass #we ignore problems setting the locale and leave the default
 
-  return old_locale
+  yield
+
+  # restore default language
+  locale.setlocale(locale.LC_ALL, old_locale)
+
+
+def chordbook(filename, objects, title, subtitle, url, settings):
+  """Generate the PDF version of the chordbook
+
+
+  Parameters:
+
+    filename (str): The complete path to the destination filename
+
+    objects (list): An ordered list of song objects that will be inserted into
+      this chordbook
+
+    title (str): The title that will be shown in italics. This is normally
+      something like "Collection"
+
+    subtitle (str): The subtitle. This is normally the name of the collection
+
+    url (str): The URL to this PDF, so people can download it
+
+    settings (dict): Pelican settings
+
+
+  Returns:
+
+    SongBookTemplate: A ReportLab BaseDocTemplate with all the songs encoded
+    inside.
+
+  """
+
+  from reportlab.platypus.tableofcontents import TableOfContents
+  from reportlab.platypus import NextPageTemplate, PageBreak
+
+  with pelican_locale(settings):
+    doc = SongBookTemplate(filename)
+    siteurl = settings.get('SITEURL', 'http://example.com')
+    doc.author = settings.get('AUTHOR', 'Unknown Editor')
+    doc.title = 'Cifras de %s' % siteurl
+    doc.subject = 'Compilação de Letras e Cifras'
+
+    story = cover_page(title, subtitle, url, siteurl)
+
+    #appends and prepares table of contents
+    story.append(NextPageTemplate('TOC'))
+    story.append(PageBreak())
+    story.append(TableOfContents())
+    story[-1].levelStyles[0] = style['toc-entry']
+    story[-1].dotsMinLevel = 0 #connecting dots
+
+    #adds the lyrics
+    for o in objects:
+      po = PdfSong(o)
+      po.add_page_template(doc)
+      story.append(NextPageTemplate(po.template_id()))
+      story.append(PageBreak())
+      story += po.story(doc)
+
+    #multi-pass builds are necessary to handle TOCs correctly
+    doc.multiBuild(story)
+
+    return doc
+
+
+def song(filename, song, settings):
+  """Generate the PDF version of the chordbook
+
+
+  Parameters:
+
+    filename (str): The complete path to the destination filename
+
+    song (Song): A single song object to create the PDF for
+      this chordbook
+
+    settings (dict): Pelican settings
+
+
+  Returns:
+
+    SongBookTemplate: A ReportLab BaseDocTemplate with the song encoded inside.
+
+  """
+
+  with pelican_locale(settings):
+
+    doc = SongTemplate(filename)
+    doc.author = settings.get('AUTHOR', 'Unknown Editor')
+    doc.title = song.title
+    doc.subject = 'Letra e Cifra'
+
+    so = PdfSong(song)
+
+    story = so.story(doc)
+    so.add_page_template(doc)
+    doc.build(story)
+
+    return doc

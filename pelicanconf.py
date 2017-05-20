@@ -9,7 +9,7 @@ SITESUBTITLE = 'Músicas & Coletâneas'
 SITEDESCRIPTION = 'Website de Cifras'
 SITELOGO = '/images/profile_128.png'
 FAVICON = '/images/favicon.ico'
-SITEURL = 'http://chords.andreanjos.org'
+SITEURL = 'http://cifras.andreanjos.org'
 
 # Theme setup
 THEME = 'theme'
@@ -64,11 +64,13 @@ LINKS = (
     ('Músicas', '/'),
     ('Artistas', '/artists/'),
     ('Coletâneas', '/collections/'),
+    ('Download', '/cifras.pdf'),
     ('Sobre', '/sobre/'),
     )
 
 # Social widget
 SOCIAL = (
+    ('linkedin', 'https://www.linkedin.com/in/andreranjos/'),
     ('stack-overflow', 'https://stackoverflow.com/users/712525/andré-anjos'),
     ('github', 'https://github.com/anjos'),
     ('skype', 'skype:andrezito?call'),
@@ -112,3 +114,9 @@ SONG_SAVE_AS = 'songs/{slug}/index.html'
 COLLECTION_LIST = 'collections/index.html'
 COLLECTION_URL = 'collections/{slug}/'
 COLLECTION_SAVE_AS = 'collections/{slug}/index.html'
+
+# PDF organization
+ARTIST_PDF_SAVE_AS = 'artist/{slug}/cifras.pdf'
+SONG_PDF_SAVE_AS = 'songs/{slug}/cifra.pdf'
+COLLECTION_PDF_SAVE_AS = 'collections/{slug}/cifras.pdf'
+CHORDBOOK_PDF_SAVE_AS = 'cifras.pdf'

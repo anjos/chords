@@ -52,7 +52,6 @@ class Song(pelican.contents.Content):
     return (i[:cut], i[cut:])
 
 
-
 class Collection(pelican.contents.Content):
   '''A collection corresponds to a list of songs with a name
   '''

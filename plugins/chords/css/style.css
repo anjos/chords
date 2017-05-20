@@ -1,45 +1,37 @@
-/* Style for chord pages */
-
 .chords p.title {
   font-size: 1.4em;
   margin-bottom: 5px;
 }
-
 .chords a img {
   border: none;
 }
-
 .chords p.tone {
   font-style: italic;
   margin-top: 0px;
   padding-top: 0px;
   color: #444;
 }
-
 .chords pre {
   color: #444;
+  background-color: transparent;
+  border: none;
 }
-
 .chords pre.song .hashcomment, .chords pre.song .comment {
   color: #aaa;
   font-style: italic;
 }
-
 .chords pre.song .chords {
   color: #00a;
   font-weight: bold;
 }
-
 .chords pre.song .chorus {
   color: #a00;
   font-weight: bold;
 }
-
 .chords pre.song .tablature {
   color: #070;
   font-weight: bold;
 }
-
 .chords p.song-performer {
   height: 85px;
   font-size: 30px;
@@ -49,36 +41,29 @@
   text-align: right;
   margin-bottom: 0px;
 }
-
 .chords p.song-performer a:link, .chords p.song-performer a:visited {
   text-decoration: none;
   color: #fff;
 }
-
 .chords p.song-performer a:hover {
   text-decoration: none;
   color: #ff0;
 }
-
 .chords p.song-performer a:hover img {
   border-color: #ff0;
 }
-
 .chords p.song-performer img {
   border: 3px white solid;
   border-radius: 3px;
 }
-
 .chords .info-bar {
   border-bottom: 2px solid black;
   padding: 8px;
   padding-bottom: 30px;
 }
-
 .chords .info-bar img {
   vertical-align: top;
 }
-
 .chords .info-bar .actions {
   float: left;
   font-size: 0.8em;
@@ -88,11 +73,9 @@
   margin: 0px;
   font-family: verdana, arial, helvetica, sans;
 }
-
 .chords .info-bar .actions img {
   vertical-align: middle;
 }
-
 .chords .info-bar .revision-info {
   float: right;
   font-size: 0.8em;
@@ -103,15 +86,12 @@
   font-family: verdana, arial, helvetica, sans;
   font-style: italic;
 }
-
 .chords .info-bar .revision-info img {
   vertical-align: middle;
 }
-
 .chords .info-bar .revision-info .revision-author {
   font-weight: bold;
 }
-
 .chords .performer-simple-picture {
   float: left;
   margin-top: 5px;
@@ -120,24 +100,23 @@
   border-style: solid;
   border-radius: 3px;
 }
-
 .chords .performer-simple-picture img {
   border: 3px white solid;
   border-radius: 3px;
 }
-
 .chords table.two_columns {
   width: 100%;
+  border-color: transparent;
 }
-
 .chords table.two_columns td {
   vertical-align: top;
 }
-
 .chords table.two_columns td.separator {
   border-right: 3px solid;
 }
-
 .chords table.two_columns td#column_2 {
   padding-left: 5px;
+}
+.chords-list {
+  padding-top: 1em;
 }

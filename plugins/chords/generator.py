@@ -129,11 +129,85 @@ class Generator(pelican.generators.CachingGenerator):
     pelican.signals.page_generator_finalized.send(self)
 
 
+  def _generate_pdf(self):
+    """Generate pdf pages for specific entries"""
+
+    import time
+
+    from .pdf import chordbook, song
+
+    baseurl = self.settings.get('SITEURL', '/')
+    output = self.settings.get('OUTPUT_PATH', 'output')
+    author = self.settings.get('AUTHOR', 'Unknown Editor')
+
+    # all chords
+    start = time.time()
+    basename = self.settings.get('CHORDBOOK_PDF_SAVE_AS', 'pdfs/chordbook.pdf')
+    filename = os.path.join(output, basename)
+    dirname = os.path.dirname(filename)
+    if not os.path.exists(dirname): os.makedirs(dirname)
+
+    doc = chordbook(filename, self.songs, 'Cifras por', author,
+        '/'.join((baseurl, basename)), self.settings)
+    print('Done: Chords plug-in processed site-wide PDF in {:.2f} ' \
+        'seconds'.format(time.time()-start))
+
+    # per artist
+    start = time.time()
+    for k in self.artists:
+      if len(k.songs) == 0:
+        print('Skip: Chords plug-in skipped artist %s - no songs' % k.slug)
+        continue
+      basename = self.settings.get('ARTIST_PDF_SAVE_AS',
+          'pdfs/artists/{slug}.pdf')
+      basename = basename.format(slug=k.slug)
+      filename = os.path.join(output, basename)
+      dirname = os.path.dirname(filename)
+      if not os.path.exists(dirname): os.makedirs(dirname)
+      doc = chordbook(filename, k.songs, 'Cifras de %s' % k.name,
+          'por %s' % author, '/'.join((baseurl, basename)), self.settings)
+      setattr(k, 'pdf_url', basename)
+    print('Done: Chords plug-in processed {} artist PDFs in {:.2f} ' \
+        'seconds'.format(len(self.artists), time.time()-start))
+
+    # per song
+    start = time.time()
+    for k in self.songs:
+      basename = self.settings.get('SONG_PDF_SAVE_AS', 'pdfs/songs/{slug}.pdf')
+      basename = basename.format(slug=k.slug)
+      filename = os.path.join(output, basename)
+      dirname = os.path.dirname(filename)
+      if not os.path.exists(dirname): os.makedirs(dirname)
+      doc = song(filename, k, self.settings)
+      setattr(k, 'pdf_url', basename)
+    print('Done: Chords plug-in processed {} song PDFs in {:.2f} ' \
+        'seconds'.format(len(self.songs), time.time()-start))
+
+    # per collection
+    start = time.time()
+    for k in self.collections:
+      if len(k.songs) == 0:
+        print('Skip: Chords plug-in skipped collection %s - no songs' % k.slug)
+        continue
+      basename = self.settings.get('COLLECTION_PDF_SAVE_AS',
+          'pdfs/collections/{slug}.pdf')
+      basename = basename.format(slug=k.slug)
+      filename = os.path.join(output, basename)
+      dirname = os.path.dirname(filename)
+      if not os.path.exists(dirname): os.makedirs(dirname)
+      doc = chordbook(filename, k.songs, 'Cifras da Coletânea %s' % k.title,
+          'por %s' % author, '/'.join((baseurl, basename)), self.settings)
+      setattr(k, 'pdf_url', basename)
+    print('Done: Chords plug-in processed {} collection PDFs in {:.2f} ' \
+        'seconds'.format(len(self.collections), time.time()-start))
+
+
   def _generate_indexes(self, writer):
     """Generate pages allowing the user to nagivate from object to object"""
 
     for model, objects in ((Artist, self.artists), (Song, self.songs),
         (Collection, self.collections)):
+      objects = objects if model == Song else [k for k in objects if k.songs]
       name = model.__name__.lower()
       save_as = self.settings.get("%s_LIST" % name.upper(),
           "%ss/index.html" % name)
@@ -155,6 +229,10 @@ class Generator(pelican.generators.CachingGenerator):
 
     # writes specific
     for obj in itertools.chain(self.artists, self.songs, self.collections):
+      if isinstance(obj, (Artist, Collection)) and not obj.songs:
+        print('Skip: Chords plug-in skipped %s %s - no songs' % \
+            (obj.__class__.__name__.lower(), obj.slug))
+        continue
       writer.write_file(
           obj.save_as,
           self.get_template(obj.template),
@@ -172,5 +250,6 @@ class Generator(pelican.generators.CachingGenerator):
     Should trigger the generation of all required documents.
     """
 
+    self._generate_pdf() #this has to come first so pdf_urls are set
     self._generate_objects(writer)
     self._generate_indexes(writer)
