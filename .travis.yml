@@ -15,7 +15,7 @@ install:
   - conda update -n root -q conda
   - conda info -a
   - conda env create -f env.yml
-  - source activate chords2
+  - source activate chords
 
 script:
   - pelican
