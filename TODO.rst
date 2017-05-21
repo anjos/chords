@@ -1,4 +1,3 @@
-* Improve song organization
 * Recover test units
 * Recover conversion script
 * Solve locale issues and implement it right

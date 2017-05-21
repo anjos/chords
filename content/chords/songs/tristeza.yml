@@ -1,21 +1,30 @@
 title: Tristeza
-date: 2010-12-12
-modified: 2010-12-12
+date: 2010-10-24
+modified: 2010-10-24
 year: 1965
 performer-slug: beth-carvalho
 composer-slug: haroldo-lobo
 two-columns: false
 tone: C
 song: |
-  Tris[C7M]teza[C6(9)]
-  [C7M]Por favor[Eb°] vai e[Dm7]mbora[Eb7(9)]
-  [Dm7]  Minha alma que [G7(13)]chora
-  [Dm7]  Está v[G7]endo o meu f[C7M]im
-  [Gm7]  Fez do meu co[C7]ração a s[F7M]ua moradia
-  [Fm6]  Já é demais o meu pen[Em7]ar
-  [A7]  Quero voltar aquela[D7(9)] vida de alegria
-  Q[G7]uero de novo can[C6(9)]tar
-  [C7(9)]  Lá, rai,[F7M] a, r[F6]á,
-  [Fm7]   laiarai,[Bb7(9)] a, rai, [Em7]a, ra,
-  [A7]   laia, rai, [Eb7(9)]arai,  [D7(9)]a, ra.
-  [G7(13)]Quero de [G7(b13)]novo cant[C6(9)]ar
+  {sot}
+  Intro: F
+  {eot}
+
+  T[F]risteza, por [D7]favor vá e[Gm]mbora
+  Minha alma que [C7]chora está vendo o meu [F]fim[C7]
+  T[F]risteza, por [D7]favor vá e[Gm]mbora
+  Minha alma que [C7]chora está vendo o meu [F]fim[F7]
+
+  {soc}
+  Fez do meu coração a su[Bb]a moradia[Bbm]
+  Já é demais o meu pe[F]nar[E][Eb][D7]
+  Quero voltar àquela[Gm] vida de alegria
+  (*) [C7]Quero de novo can[F]tar
+  {eoc}
+
+  {comment: Na segunda passagem, cai no Laiá laiá}
+
+  {sot}
+  F7 Bb Bbm % % F - E Eb D7 % Gm % ... (*)
+  {eot}

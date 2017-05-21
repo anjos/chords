@@ -132,6 +132,11 @@ class Generator(pelican.generators.CachingGenerator):
         self.add_source_path(obj)
         _dict[obj.slug] = obj
 
+    # re-organize artists and collections - by slug
+    self.songs.sort(key=lambda x: x.slug)
+    for k in self.artists: k.songs.sort(key=lambda x: x.slug)
+    for k in self.collections: k.songs.sort(key=lambda x: x.slug)
+
     self._update_context(('artists', 'songs', 'collections'))
     self.save_cache()
     self.readers.save_cache()
