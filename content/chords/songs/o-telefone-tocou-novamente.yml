@@ -4,7 +4,7 @@ modified: 2010-12-17
 year: 1978
 performer-slug: jorge-benjor
 composer-slug: jorge-benjor
-two-columns: true
+two-columns: false
 tone: Em
 song: |+
   O tel[Em7]efone tocou novam[Bm7]ente
@@ -24,10 +24,9 @@ song: |+
   Que p[Am7]ena h[D7/9]á,há,ha
   Que p[Em7]ena
 
-
-       [D7/9]   Com ela eu sou mais eu[Em7]
-       [D7/9]    Com ela eu sou um anjo[Em7]
-       [D7/9]     Com ela eu sou crian[Em7]ça
+  [D7/9] Com ela eu sou mais eu[Em7]
+  [D7/9] Com ela eu sou um anjo[Em7]
+  [D7/9] Com ela eu sou crian[Em7]ça
   Eu sou a p[Am]az,
   Eu sou o[C9] amor
   E a espera[B]nça

@@ -4,7 +4,7 @@ modified: 2010-12-17
 year: 1987
 performer-slug: djavan
 composer-slug: djavan
-two-columns: true
+two-columns: false
 tone: A
 song: |+
   {sot}
@@ -37,5 +37,3 @@ song: |+
   Pa-[D#m7(b5)]--------ra mim [Dm6]    que estou[A/C#][A/B][A*][A/F#]
 
   Ju[E7(4)]rado  pra morrer de a[Bb7M(#11)]mor[A4][A***][C7M(#11)]
-
-...
