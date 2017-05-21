@@ -1,4 +1,3 @@
-* Fix locale produced by Travis CI deployment
 * Add Pictures for artists
 * Recover test units
 * Recover conversion script
