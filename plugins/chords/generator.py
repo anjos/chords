@@ -13,6 +13,7 @@ import time
 import datetime
 import itertools
 import yaml
+import pkg_resources
 
 import logging
 logger = logging.getLogger(__name__)
@@ -33,6 +34,8 @@ _DEFAULT_SETTINGS = dict(
     CHORDS_COLLECTIONS_EXCLUDES = [],
     )
 
+_UNKNOWN_IMAGE_PATH = pkg_resources.resource_filename(__name__,
+    os.path.join('img', 'unknown.jpg'))
 
 class Generator(pelican.generators.CachingGenerator):
   """Generate context for chords items (artists, songs and collections)"""
@@ -91,6 +94,12 @@ class Generator(pelican.generators.CachingGenerator):
             os.path.basename(os.path.splitext(obj.source_path)[0])))
 
           if klass == Artist:
+            # use this image for the artist
+            img = os.path.splitext(path)[0] + '.jpg'
+            if not os.path.exists(img): img = _UNKNOWN_IMAGE_PATH
+            setattr(obj, 'image_path', img)
+
+            # initializes song list
             setattr(obj, 'songs', [])
 
           if klass == Song:

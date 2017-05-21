@@ -333,7 +333,6 @@ class PdfSong(object):
 
     from reportlab.lib.colors import Color
     from reportlab.lib.units import cm
-    import pkg_resources
 
     # draws the rectangle with the performer name and picture
     # remember: coordinates (0,0) start at bottom left and go up and to the
@@ -345,9 +344,7 @@ class PdfSong(object):
     rect_height = page_height - y
     canvas.rect(0, y, page_width, rect_height, fill=True, stroke=False)
 
-    path = pkg_resources.resource_filename(__name__, os.path.join('img',
-      'unknown.jpg'))
-    image = PIL.Image.open(path)
+    image = PIL.Image.open(self.song.performer.image_path)
 
     image_height = 100
     image_width = (image_height/float(image.height)) * image.width
@@ -359,8 +356,8 @@ class PdfSong(object):
     canvas.setStrokeGray(0.8)
     canvas.roundRect(image_x-border, image_y-border, image_width + (2*border),
         image_height + (2*border), radius=border/2, fill=True, stroke=True)
-    canvas.drawImage(path, image_x, image_y, width=image_width,
-        height=image_height, mask=None)
+    canvas.drawImage(self.song.performer.image_path, image_x, image_y,
+        width=image_width, height=image_height, mask=None)
 
     name = canvas.beginText()
     name.setTextOrigin(doc.leftMargin, y+0.4*cm)
