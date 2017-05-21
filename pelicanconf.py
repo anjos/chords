@@ -41,8 +41,7 @@ DELETE_OUTPUT_DIRECTORY = True
 
 TIMEZONE = 'Europe/Zurich'
 
-DEFAULT_LANG = 'pt'
-LOCALE = ('pt_BR', 'en_US')
+DEFAULT_LANG = 'pt_BR'
 DEFAULT_DATE_FORMAT = '%d/%m/%Y'
 
 # Feed generation is usually not desired when developing

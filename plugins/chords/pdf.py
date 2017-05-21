@@ -517,7 +517,7 @@ def pelican_locale(settings):
 
   # LOCALE setup
   # sets the locale so the dates and such get correctly printed
-  pelican_locale = settings.get('LOCALE', ('en',))[0]
+  pelican_locale = settings.get('DEFAULT_LANG', ('en_US',))[0]
 
   old_locale = locale.getlocale()
   # this will try to get a language we support from the user preferences
