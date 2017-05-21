@@ -292,7 +292,7 @@ class SongBookTemplate(BaseDocTemplate):
       self.notify('TOCEntry', (0, flowable.getPlainText(), self.page, key))
 
 
-def cover_page(title, subtitle, url, siteurl):
+def cover_page(title, subtitle, url, siteurl, dateformat):
   """Bootstraps our PDF sequence of flowables."""
 
   from reportlab.platypus import Paragraph, Spacer, PageBreak
@@ -304,7 +304,7 @@ def cover_page(title, subtitle, url, siteurl):
   story.append(Spacer(1, 3*cm))
 
   story.append(Paragraph('Compilado <b>%s</b><br/>%s' % \
-      (datetime.date.today().strftime('%a, %d/%b/%Y'), url),
+      (datetime.date.today().strftime(dateformat), url),
       style['cover-subtitle']))
   return story
 
@@ -318,11 +318,14 @@ class PdfSong(object):
 
     song (Song): a song object
 
+    dateformat (str): The format of the date to use for PDF generation
+
   """
 
 
-  def __init__(self, song):
+  def __init__(self, song, dateformat):
     self.song = song
+    self.dateformat = dateformat
 
 
   def basic_page(self, canvas, doc):
@@ -370,7 +373,7 @@ class PdfSong(object):
     revision.setTextOrigin(doc.leftMargin, doc.bottomMargin-(0.1*cm))
     revision.setFont('Times-Italic', 9)
     revision.setFillColor(Color(0, 0.4, 0, 1))
-    revision.textLine(self.song.modified.strftime('%a, %d/%b/%Y'))
+    revision.textLine(self.song.modified.strftime(self.dateformat))
     canvas.drawText(revision)
 
     # draws a line between the columns if we are in two column mode
@@ -568,8 +571,9 @@ def chordbook(filename, objects, title, subtitle, url, settings):
     doc.author = settings.get('AUTHOR', 'Unknown Editor')
     doc.title = 'Cifras de %s' % siteurl
     doc.subject = 'Compilação de Letras e Cifras'
+    dateformat = settings.get('DEFAULT_DATE_FORMAT', '%d/%m/%Y')
 
-    story = cover_page(title, subtitle, url, siteurl)
+    story = cover_page(title, subtitle, url, siteurl, dateformat)
 
     #appends and prepares table of contents
     story.append(NextPageTemplate('TOC'))
@@ -580,7 +584,7 @@ def chordbook(filename, objects, title, subtitle, url, settings):
 
     #adds the lyrics
     for o in objects:
-      po = PdfSong(o)
+      po = PdfSong(o, dateformat)
       po.add_page_template(doc)
       story.append(NextPageTemplate(po.template_id()))
       story.append(PageBreak())
@@ -618,8 +622,9 @@ def song(filename, song, settings):
     doc.author = settings.get('AUTHOR', 'Unknown Editor')
     doc.title = song.title
     doc.subject = 'Letra e Cifra'
+    dateformat = settings.get('DEFAULT_DATE_FORMAT', '%d/%m/%Y')
 
-    so = PdfSong(song)
+    so = PdfSong(song, dateformat)
 
     story = so.story(doc)
     so.add_page_template(doc)
